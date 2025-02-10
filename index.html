@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type=“text/css” href="styles.css">
+    <link rel="icon" type="image/x-icon" href="favicon.png">
+    <title>(Psst... try typing MUSIC)</title>
+    
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Sound Explorer</h1>
+            <p>An interactive sound pad to create and mix beats using your keyboard, mouse, or touch</p>
+            <div class="controls">
+                <div class="volume-control">
+                    <div class="tooltip-container">
+                        <button id="muteBtn" aria-label="Toggle mute">🔊</button>
+                        <input type="range" id="volumeSlider" min="0" max="100" value="50">
+                        <span class="tooltip">Volume control uses the Web Audio API's GainNode to adjust sound levels. The mute button toggles between 0 and the current volume value.</span>
+                    </div>
+                </div>
+                <div class="waveform-control">
+                    <div class="tooltip-container">
+                        <label for="waveform">Waveform:</label>
+                        <select id="waveform">
+                            <option value="sine">Sine</option>
+                            <option value="square">Square</option>
+                            <option value="triangle">Triangle</option>
+                            <option value="sawtooth">Sawtooth</option>
+                        </select>
+                        <span class="tooltip">Changes the OscillatorNode type in Web Audio API, affecting the sound's timbre. Each waveform produces a different harmonic content.</span>
+                    </div>
+                </div>
+                <div class="recording-controls">
+                    <div class="tooltip-container">
+                        <button id="recordBtn" class="record-btn">⏺️ Record</button>
+                        <button id="playBtn" class="play-btn" disabled>▶️ Play</button>
+                        <span class="tooltip">Recording uses MediaRecorder API to capture audio output. Playback uses an AudioBufferSourceNode to replay the recorded sequence.</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="tooltip-container_2" style="width: 100%;">
+            <canvas id="visualizer"></canvas>
+            <span class="tooltip_2">This visualizer shows real-time audio frequencies using Web Audio API's AnalyserNode. The rainbow-colored waveform represents different frequency ranges - lower frequencies on the left, higher on the right. The height of each bar indicates the volume at that frequency, creating a dynamic visual representation of the sounds you play.</span>
+        </div>
+
+        <div class="sound-grid">
+            <button class="sound-pad" data-note="C" style="background: #9333ea">
+                <span>C</span>
+                <small>A</small>
+            </button>
+            <button class="sound-pad" data-note="D" style="background: #3b82f6">
+                <span>D</span>
+                <small>S</small>
+            </button>
+            <button class="sound-pad" data-note="E" style="background: #6366f1">
+                <span>E</span>
+                <small>D</small>
+            </button>
+            <button class="sound-pad" data-note="F" style="background: #8b5cf6">
+                <span>F</span>
+                <small>F</small>
+            </button>
+            <button class="sound-pad" data-note="G" style="background: #7c3aed">
+                <span>G</span>
+                <small>G</small>
+            </button>
+            <button class="sound-pad" data-note="A" style="background: #2563eb">
+                <span>A</span>
+                <small>H</small>
+            </button>
+            <button class="sound-pad" data-note="B" style="background: #4f46e5">
+                <span>B</span>
+                <small>J</small>
+            </button>
+            <button class="sound-pad" data-note="C2" style="background: #7c3aed">
+                <span>C2</span>
+                <small>K</small>
+            </button>
+        </div>
+
+        <p class="instruction-text">Use your keyboard (A-K), click, or tap the pads to play sounds</p>
+        <p class="warning">Note: If a sound gets stuck, refresh your browser to clear all active sounds</p>
+        <p class="mobile-note">On mobile devices, make sure your device isn't in silent mode and tap a pad to start the audio.</p>
+
+        <footer>
+            <p class="context">This page was created by Luca Zell during the winter term 2024/25 in the <a href="https://infovis.fh-potsdam.de/interinfo/" target="_blank">Interactive Information</a> course of the <a href="https://www.fh-potsdam.de/studium-weiterbildung/studiengaenge/interfacedesign-b" target="_blank">Interface Design</a> program at the University of Applied Sciences Potsdam.</p>
+            <p class="tech-details">This project is built using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API" target="_blank">Web Audio API</a>, which provides powerful tools for processing and synthesizing audio in web applications. Features include oscillators for sound generation, gain nodes for volume control, and analyzers for visualizing audio frequencies.</p>
+        </footer>
+    </div>
+    <script type="module" src="script.js"></script>
+</body>
+</html>
+
