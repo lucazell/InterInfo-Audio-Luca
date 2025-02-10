@@ -1,3 +1,4 @@
+
 /**
  * Recorder class handles recording and playback of sound sequences
  * storing timing information for accurate replay
@@ -8,11 +9,11 @@ class Recorder {
         this.isRecording = false;
         this.recordedNotes = [];
         this.recordStartTime = 0;
+        this.activeNotes = new Map(); // Track currently playing notes
         
         this.setupControls();
     }
 
-    // Set up record and play button event listeners
     setupControls() {
         const recordBtn = document.getElementById('recordBtn');
         const playBtn = document.getElementById('playBtn');
@@ -36,29 +37,47 @@ class Recorder {
         });
     }
 
-    // Start recording mode
     startRecording() {
         this.isRecording = true;
         this.recordedNotes = [];
         this.recordStartTime = Date.now();
+        this.activeNotes.clear();
     }
 
-    // Stop recording mode
     stopRecording() {
+        // End any notes that are still active when recording stops
+        this.activeNotes.forEach((startTime, note) => {
+            this.recordNoteEnd(note);
+        });
         this.isRecording = false;
     }
 
-    // Record a note with its timestamp
     recordNote(note) {
         if (this.isRecording) {
+            const timestamp = Date.now();
+            this.activeNotes.set(note, timestamp);
             this.recordedNotes.push({
                 note: note,
-                timestamp: Date.now()
+                startTime: timestamp,
+                endTime: null
             });
         }
     }
 
-    // Play back recorded sequence with correct timing
+    recordNoteEnd(note) {
+        if (this.isRecording && this.activeNotes.has(note)) {
+            const endTime = Date.now();
+            const noteIndex = this.recordedNotes.findIndex(n => 
+                n.note === note && n.endTime === null
+            );
+            
+            if (noteIndex !== -1) {
+                this.recordedNotes[noteIndex].endTime = endTime;
+            }
+            this.activeNotes.delete(note);
+        }
+    }
+
     playRecording() {
         if (this.recordedNotes.length === 0) return;
 
@@ -67,26 +86,36 @@ class Recorder {
         playBtn.disabled = true;
         recordBtn.disabled = true;
 
-        // Calculate relative timings from first note
-        let startTime = this.recordedNotes[0].timestamp;
+        const startTime = this.recordedNotes[0].startTime;
+        const activeOscillators = new Map();
         
-        // Play each note at its recorded time
         this.recordedNotes.forEach(note => {
+            // Schedule note start
             setTimeout(() => {
-                this.audioController.playSound(note.note);
+                const oscillator = this.audioController.playSound(note.note, true);
+                activeOscillators.set(note.note, oscillator);
                 const pad = document.querySelector(`[data-note="${note.note}"]`);
-                if (pad) {
-                    pad.classList.add('active');
-                    setTimeout(() => pad.classList.remove('active'), 200);
+                if (pad) pad.classList.add('active');
+            }, note.startTime - startTime);
+
+            // Schedule note end
+            setTimeout(() => {
+                const oscillator = activeOscillators.get(note.note);
+                if (oscillator) {
+                    oscillator.stop();
+                    activeOscillators.delete(note.note);
                 }
-            }, note.timestamp - startTime);
+                const pad = document.querySelector(`[data-note="${note.note}"]`);
+                if (pad) pad.classList.remove('active');
+            }, note.endTime - startTime);
         });
 
-        // Re-enable buttons after playback
+        // Re-enable buttons after the last note ends
+        const lastNote = this.recordedNotes[this.recordedNotes.length - 1];
         setTimeout(() => {
             playBtn.disabled = false;
             recordBtn.disabled = false;
-        }, this.recordedNotes[this.recordedNotes.length - 1].timestamp - startTime + 200);
+        }, lastNote.endTime - startTime + 200);
     }
 }
 
